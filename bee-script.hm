@@ -1,0 +1,222 @@
+%include <memory>
+%include <syntax-node.h>
+
+%return std::shared_ptr<SyntaxNode>
+
+# Line comments
+%ignore "#[^\n]*\n"
+
+# Terminals
+SEMICOLON = ";";
+OPEN_CURLY = "\{";
+CLOSE_CURLY = "\}";
+OPEN_PAREN = "\(";
+CLOSE_PAREN = "\)";
+OPEN_SQUARE = '\[';
+CLOSE_SQUARE = "\]";
+COMMA = ",";
+COLON = ":";
+ARROW = "->";
+
+KW_IF = "if";
+KW_ELIF = "elif";
+KW_ELSE = "else";
+KW_DEF = "def";
+
+OP_ASSIGN = "=";
+
+TYPE_INT = "int";
+TYPE_BOOL = "bool";
+TYPE_STR = "str";
+
+LIT_INT = "-?\d+";
+LIT_STR = '"([^"]|(\"))*"';
+LIT_BOOL_FALSE = "false";
+LIT_BOOL_TRUE = "true";
+
+# This goes after all the builtins
+NAME = "[\l\u][\l\u\d_]*";
+
+# Starting rule
+program = top_level_defs;
+
+top_level_defs
+    = top_level_def
+    | top_level_def top_level_defs
+    {
+        $0->next = $1;
+        return $0;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+top_level_def
+    = func_def
+    | var_def
+    ;
+
+func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
+    {
+        auto out = std::make_shared<DeclNode>();
+
+        out->name = $NAME;
+
+        auto funcType = std::make_shared<TypeNode>();
+        funcType->type = Type::Func;
+        funcType->subtype = $type;
+        funcType->args = $arg_def_list;
+
+        out->type = funcType;
+        out->code = $block;
+
+        return out;
+    }
+    ;
+
+arg_def_list
+    = arg_def arg_def_list
+    {
+        $arg_def->next = $arg_def_list;
+        return $arg_def;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+arg_def = NAME COLON type
+    {
+        auto out = std::make_shared<ArgList>();
+        out->type = $type;
+        out->name = $NAME;
+        return out;
+    }
+    ;
+
+var_def = NAME COLON type OP_ASSIGN expr SEMICOLON
+    {
+        auto out = std::make_shared<DeclNode>();
+        out->name = $NAME;
+        out->type = type;
+        out->value = $expr
+        return out;
+    }
+    ;
+
+type 
+    = type_name OPEN_SQUARE LIT_INT CLOSE_SQUARE
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->type = Type::Array;
+        out->subtype = $type_name;
+        return out;
+    }
+    | type_name
+    ;
+
+type_name
+    = TYPE_INT
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->type = Type::Int;
+        return out;
+    }
+    | TYPE_STR
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->type = Type::Str;
+        return out;
+    }
+    | TYPE_BOOL
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->type = Type::Bool;
+        return out;
+    }
+    ;
+
+
+block = OPEN_CURLY stmt_list CLOSE_CURLY
+    {
+        return $stmt_list;
+    }
+    ;
+
+stmt_list
+    = stmt stmt_list
+    {
+        $stmt->next = $stmt_list;
+        return $stmt;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+stmt
+    = var_def
+    | if_clause elif_clauses
+    {
+        auto out = $if_clause;
+        out->elseBody = $elif_clauses;
+        return out;
+    }
+    | expr
+    ;
+
+if_clause = KW_IF OPEN_PAREN expr CLOSE_PAREN block
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::IfElse;
+        out->expr = $expr;
+        out->body = $block;
+        return out;
+    }
+    ;
+
+
+elif_clauses 
+    = elif_clause elif_clauses
+    {
+        auto out = $elif_clause;
+        out->elseBody = $elif_clauses;
+        return out;
+    }
+    | else_clause
+    ;
+
+elif_clause = KW_ELIF OPEN_PAREN expr CLOSE_PAREN block
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::IfElse;
+        out->expr = $expr;
+        out->body = $block;
+        return out;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+else_clause = KW_ELSE block
+    {
+        return $block;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+expr = EMPTY
+    {
+        // TODO
+        return nullptr;
+    }
+    ;
