@@ -28,7 +28,7 @@ enum class Type
     Array
 };
 
-class ArgList : SyntaxNode
+class ArgList : public SyntaxNode
 {
 public:
     std::string name;
@@ -59,14 +59,66 @@ public:
     StmtType kind;
     DeclNodePtr decl;
     ExprNodePtr initExpr;
-    ExprNode expr;
+    ExprNodePtr expr;
     ExprNodePtr nextExpr;
     StmtNodePtr body;
     StmtNodePtr elseBody;
 };
 
+enum class ExprType
+{
+    Error,
+
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Pow,
+    Neg,
+
+    Name,
+    Arg,
+
+    LogAnd,
+    LogOr,
+    LogNot,
+    LogEqu,
+    LogNeq,
+
+    CmpLT,
+    CmpLTEQ,
+    CmpGT,
+    CmpGTEQ,
+
+    Call,
+    Subscript,
+
+    LitInt,
+    LitBool,
+    LitStr
+};
+
 class ExprNode : public SyntaxNode
 {
+public:
+    ExprType type;
+    ExprNodePtr left, right;
+
+    std::string name;
+    int intValue;
+    std::string strValue;
+
+    ExprNode()
+    {
+    }
+
+    ExprNode(ExprType type, SyntaxNodePtr left, SyntaxNodePtr right)
+        : type(type)
+        , left(std::static_pointer_cast<ExprNode>(left))
+        , right(std::static_pointer_cast<ExprNode>(right))
+    {
+    }
 };
 
 class DeclNode : public SyntaxNode

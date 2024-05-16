@@ -17,9 +17,9 @@
     ],
     "buildPresets": [
         {
-            "name": "tests",
+            "name": "bees",
             "configurePreset": "default",
-            "targets": ["tests"]
+            "targets": ["bees"]
         }
     ]
 }

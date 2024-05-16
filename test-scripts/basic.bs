@@ -1,0 +1,12 @@
+
+
+def main() -> int
+{
+    x: int = 0;
+    y: str = "asdf";
+    z: bool = false;
+
+    x = x + 1;
+
+    return 0;
+}

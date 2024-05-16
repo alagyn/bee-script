@@ -16,6 +16,11 @@ add_executable(bees
     src/main.cpp
 )
 
+target_include_directories(beescript
+    PRIVATE
+        inc
+)
+
 target_include_directories(bees
     PRIVATE
         inc
