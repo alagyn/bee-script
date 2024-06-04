@@ -10,6 +10,7 @@ find_package(hermes 1.0.0
 add_hermes_grammar(
     GRAMMAR bee-script.hm
     TARGET beescript
+    DEBUG
 )
 
 add_executable(bees

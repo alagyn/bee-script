@@ -45,6 +45,7 @@ public:
 
 enum class StmtType
 {
+    Assign,
     Decl,
     Expr,
     For,

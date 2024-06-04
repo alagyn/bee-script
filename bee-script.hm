@@ -51,7 +51,7 @@ TYPE_BOOL = "bool";
 TYPE_STR = "str";
 
 LIT_INT = "-?\d+";
-LIT_STR = '"([^"]|(\"))*"';
+LIT_STR = '"([^"]|(\\"))*"';
 LIT_BOOL_FALSE = "false";
 LIT_BOOL_TRUE = "true";
 
@@ -195,13 +195,38 @@ stmt_list
 
 stmt
     = var_def
-    | if_clause elif_clauses
+    | if_clause else_clauses
     {
         auto out = std::static_pointer_cast<StmtNode>($if_clause);
-        out->elseBody = std::static_pointer_cast<StmtNode>($elif_clauses);
+        out->elseBody = std::static_pointer_cast<StmtNode>($else_clauses);
         return out;
     }
-    | expr
+    | basic_stmt SEMICOLON
+    ;
+
+basic_stmt
+    = expr
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Expr;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
+    | loc OP_ASSIGN expr
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Assign;
+        out->expr = std::static_pointer_cast<ExprNode>($loc);
+        out->nextExpr = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
+    | KW_RETURN expr
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Return;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
     ;
 
 if_clause
@@ -215,7 +240,23 @@ if_clause
     }
     ;
 
-elif_clauses 
+else_clauses
+    = elif_clauses else_clause
+    {
+        auto out = std::static_pointer_cast<StmtNode>($elif_clauses);
+        auto temp = out;
+        // Find trailing elif
+        while (temp->elseBody)
+        {
+            temp = temp->elseBody;
+        }
+        temp->elseBody = std::static_pointer_cast<StmtNode>($else_clause);
+        return out;
+    }
+    | else_clause
+    ;
+
+elif_clauses
     = elif_clause elif_clauses
     {
         auto out = std::static_pointer_cast<StmtNode>($elif_clause);
@@ -223,8 +264,8 @@ elif_clauses
         return out;
     }
     | elif_clause
-    | else_clause
     ;
+
 
 elif_clause 
     = KW_ELIF OPEN_PAREN expr CLOSE_PAREN block
@@ -301,22 +342,16 @@ func_or_sub
         auto out = std::make_shared<ExprNode>();
         out->type = ExprType::Call;
         
-        out->left = $bottom_val;
+        out->left = std::static_pointer_cast<ExprNode>($bottom_val);
         out->right = std::static_pointer_cast<ExprNode>($arg_call_list);
 
         return out;
     }
-    | bottom_val OPEN_SQUARE expr CLOSE_SQUARE { return std::make_shared<ExprNode>(ExprType::Subscript, $bottom_val, $expr); }
+    | bottom_val
     ;
 
 bottom_val
-    = NAME
-    {
-        auto out = std::make_shared<ExprNode>();
-        out->type = ExprType::Name;
-        out->name = $0;
-        return out;
-    }
+    = loc
     | LIT_INT
     {
         auto out = std::make_shared<ExprNode>();
@@ -327,12 +362,24 @@ bottom_val
     | LIT_STR
     {
         auto out = std::make_shared<ExprNode>();
-        out->type = ExprType::LitInt;
-        out->strValue = $0; // TODO strip quotes
+        out->type = ExprType::LitStr;
+        std::string temp = $0;
+        out->strValue = temp.substr(1, temp.size() - 1);
         return out;
     }
     | OPEN_PAREN expr CLOSE_PAREN { return $expr; }
     | lit_bool
+    ;
+
+loc 
+    = loc OPEN_SQUARE expr CLOSE_SQUARE { return std::make_shared<ExprNode>(ExprType::Subscript, $loc, $expr); }
+    | NAME
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::Name;
+        out->name = $0;
+        return out;
+    }
     ;
 
 arg_call_list
