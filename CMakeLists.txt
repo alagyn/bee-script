@@ -8,13 +8,17 @@ find_package(hermes 1.0.0
 )
 
 add_hermes_grammar(
-    GRAMMAR bee-script.hm
+    GRAMMAR grammar/bee-script.hm
+    GRAMMAR_DIR grammar
     TARGET beescript
     DEBUG
+    DESC_FILE temp.txt
+    STRICT
 )
 
 add_executable(bees
     src/main.cpp
+    src/symbol-table.cpp
 )
 
 target_include_directories(beescript

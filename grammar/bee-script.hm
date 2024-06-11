@@ -1,0 +1,109 @@
+%return std::shared_ptr<SyntaxNode>
+
+%header %%
+#include <memory>
+#include <syntax-node.h>
+%%
+
+# Line comments
+%ignore "#[^\n]*\n"
+
+# Starting rule
+program = top_level_defs;
+
+top_level_defs
+    = top_level_def
+    | top_level_def top_level_defs
+    {
+        $0->next = $1;
+        return $0;
+    }
+    ;
+
+top_level_def
+    = func_def
+    | var_def
+    ;
+
+%import conditionals.hm
+%import expressions.hm
+%import functions.hm
+%import literals.hm
+%import loops.hm
+%import terminals.hm
+%import types.hm
+
+block = OPEN_CURLY stmt_list CLOSE_CURLY
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Block;
+        out->body = std::static_pointer_cast<StmtNode>($stmt_list);
+        return out;
+    }
+    | OPEN_CURLY CLOSE_CURLY
+    {
+        // Special case of empty body
+        return nullptr;
+    }
+    ;
+
+stmt_list
+    = stmt
+    | stmt stmt_list
+    {
+        $stmt->next = $stmt_list;
+        return $stmt;
+    }
+    ;
+
+
+var_def = NAME COLON type OP_ASSIGN expr SEMICOLON
+    {
+        auto out = std::make_shared<DeclNode>();
+        out->name = $NAME;
+        out->type = std::static_pointer_cast<TypeNode>($type);
+        out->value = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
+    | NAME COLON type SEMICOLON
+    {
+        auto out = std::make_shared<DeclNode>();
+        out->name = $NAME;
+        out->type = std::static_pointer_cast<TypeNode>($type);
+        return out;
+    }
+    ;
+
+stmt
+    = var_def
+    | if_stmt
+    | for_clause
+    | basic_stmt SEMICOLON
+    ;
+
+basic_stmt
+    = expr
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Expr;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
+    | KW_RETURN expr
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::Return;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        return out;
+    }
+    ;
+
+arg_call_list
+    = expr COMMA arg_call_list
+    {
+        auto out = std::static_pointer_cast<ExprNode>($expr);
+        out->right = std::static_pointer_cast<ExprNode>($arg_call_list);
+        return out;
+    }
+    | expr
+    ;

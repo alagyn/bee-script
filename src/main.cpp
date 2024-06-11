@@ -14,10 +14,12 @@ int main(int argc, char** argv)
 
     auto input = std::make_shared<std::ifstream>(argv[1]);
 
+    SyntaxNodePtr root;
+
     try
     {
         auto parser = hermes::load_beescript();
-        auto root = parser->parse(input);
+        root = parser->parse(input);
     }
     catch(const HermesError& err)
     {

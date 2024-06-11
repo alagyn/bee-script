@@ -1,0 +1,74 @@
+if_stmt 
+    = if_clause elif_clauses else_clause
+    {
+        auto out = std::static_pointer_cast<StmtNode>($if_clause);
+        auto elifs = std::static_pointer_cast<StmtNode>($elif_clauses);
+        auto else_ = std::static_pointer_cast<StmtNode>($else_clause);
+
+        if(else_)
+        {
+            auto temp = out;
+            // Find trailing elif
+            while (temp->elseBody)
+            {
+                temp = temp->elseBody;
+            }
+            temp->elseBody = std::static_pointer_cast<StmtNode>($else_clause);
+        }
+
+        out->elseBody = elifs;
+        
+        return out;
+    }
+    | if_clause else_clause
+    {
+        auto out = std::static_pointer_cast<StmtNode>($if_clause);
+        auto else_ = std::static_pointer_cast<StmtNode>($else_clause);
+
+        out->elseBody = else_;
+        return out;
+    }
+    ;
+
+if_clause
+    = KW_IF OPEN_PAREN expr CLOSE_PAREN block
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::IfElse;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        out->body = std::static_pointer_cast<StmtNode>($block);
+        return out;
+    }
+    ;
+
+elif_clauses
+    = elif_clause elif_clauses
+    {
+        auto out = std::static_pointer_cast<StmtNode>($elif_clause);
+        out->elseBody = std::static_pointer_cast<StmtNode>($elif_clauses);
+        return out;
+    }
+    | elif_clause
+    ;
+
+elif_clause
+    = KW_ELIF OPEN_PAREN expr CLOSE_PAREN block
+    {
+        auto out = std::make_shared<StmtNode>();
+        out->kind = StmtType::IfElse;
+        out->expr = std::static_pointer_cast<ExprNode>($expr);
+        out->body = std::static_pointer_cast<StmtNode>($block);
+        return out;
+    }
+    ;
+
+else_clause 
+    = KW_ELSE block
+    {
+        return $block;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;

@@ -1,0 +1,105 @@
+expr 
+    = expr OP_ASSIGN logical_or_expr { return std::make_shared<ExprNode>(ExprType::Assign, $0, $2); }
+    | logical_or_expr
+    ;
+
+logical_or_expr = 
+    logical_or_expr KW_OR logical_and_expr { return std::make_shared<ExprNode>(ExprType::LogAnd, $0, $2); }
+    | logical_and_expr
+    ;
+
+logical_and_expr = logical_and_expr KW_AND equality_expr { return std::make_shared<ExprNode>(ExprType::LogAnd, $0, $2);}
+    | equality_expr
+    ;
+
+equality_expr 
+    = equality_expr OP_EQU compare_expr { return std::make_shared<ExprNode>(ExprType::LogEqu, $0, $2);}
+    | equality_expr OP_NEQ compare_expr { return std::make_shared<ExprNode>(ExprType::LogNeq, $0, $2);}
+    | compare_expr
+    ;
+
+compare_expr
+    = compare_expr OP_LT math_expr { return std::make_shared<ExprNode>(ExprType::CmpLT, $0, $2);}
+    | compare_expr OP_LTEQ math_expr { return std::make_shared<ExprNode>(ExprType::CmpLTEQ, $0, $2);}
+    | compare_expr OP_GT math_expr { return std::make_shared<ExprNode>(ExprType::CmpGT, $0, $2);}
+    | compare_expr OP_GTEQ math_expr { return std::make_shared<ExprNode>(ExprType::CmpGTEQ, $0, $2);}
+    | math_expr
+    ;
+
+math_expr
+    = math_expr OP_PLUS term { return std::make_shared<ExprNode>(ExprType::Add, $0, $2);}
+    | math_expr OP_MINUS term { return std::make_shared<ExprNode>(ExprType::Sub, $0, $2);}
+    | term
+    ;
+
+term
+    = term OP_STAR factor { return std::make_shared<ExprNode>(ExprType::Mul, $0, $2);}
+    | term OP_SLASH factor { return std::make_shared<ExprNode>(ExprType::Div, $0, $2);}
+    | term OP_MOD factor { return std::make_shared<ExprNode>(ExprType::Mod, $0, $2);}
+    | factor
+    ;
+
+factor
+    = factor OP_POW pow_term { return std::make_shared<ExprNode>(ExprType::Pow, $0, $2);}
+    | pow_term
+    ;
+
+pow_term
+    = KW_NOT func_or_sub { return std::make_shared<ExprNode>(ExprType::LogNot, $1, nullptr);}
+    | OP_MINUS func_or_sub { return std::make_shared<ExprNode>(ExprType::Neg, $1, nullptr);}
+    | func_or_sub
+    ;
+
+func_or_sub
+    = bottom_val OPEN_PAREN arg_call_list CLOSE_PAREN
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::Call;
+        
+        out->left = std::static_pointer_cast<ExprNode>($bottom_val);
+        out->right = std::static_pointer_cast<ExprNode>($arg_call_list);
+
+        return out;
+    }
+    | bottom_val
+    ;
+
+bottom_val
+    = loc
+    | LIT_INT
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitInt;
+        out->intValue = std::stoi($0);
+        return out;
+    }
+    | LIT_STR
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitStr;
+        std::string temp = $0;
+        out->strValue = temp.substr(1, temp.size() - 1);
+        return out;
+    }
+    | OPEN_PAREN expr CLOSE_PAREN { return $expr; }
+    | lit_bool
+    | LIT_BYTE
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitByte;
+        std::string temp = $0;
+        out->intValue = std::stoi(temp.substr(2, temp.size()), nullptr, 16);
+        return out;
+    }
+    ;
+
+loc 
+    = loc OPEN_SQUARE expr CLOSE_SQUARE { return std::make_shared<ExprNode>(ExprType::Subscript, $loc, $expr); }
+    | NAME
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::Name;
+        out->name = $0;
+        return out;
+    }
+    ;

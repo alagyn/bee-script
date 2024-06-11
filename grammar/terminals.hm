@@ -1,0 +1,50 @@
+# Terminals
+SEMICOLON = ";";
+OPEN_CURLY = "\{";
+CLOSE_CURLY = "\}";
+OPEN_PAREN = "\(";
+CLOSE_PAREN = "\)";
+OPEN_SQUARE = '\[';
+CLOSE_SQUARE = "\]";
+COMMA = ",";
+COLON = ":";
+ARROW = "->";
+
+KW_IF = "if";
+KW_ELIF = "elif";
+KW_ELSE = "else";
+KW_DEF = "def";
+KW_FOR = "for";
+KW_RETURN = "return";
+
+KW_OR = "or";
+KW_AND = "and";
+KW_NOT = "not";
+
+OP_ASSIGN = "=";
+OP_EQU = "==";
+OP_NEQ = "!=";
+OP_LT = "<";
+OP_GT = ">";
+OP_LTEQ = "<=";
+OP_GTEQ = ">=";
+OP_MINUS = "-";
+OP_PLUS = "\+";
+OP_STAR = "\*";
+OP_SLASH = "/";
+OP_MOD = "%";
+OP_POW = "\*\*";
+
+TYPE_INT = "int";
+TYPE_BOOL = "bool";
+TYPE_STR = "str";
+TYPE_BYTE = "byte";
+
+LIT_INT = "-?\d+";
+LIT_STR = '"([^"]|(\\"))*"';
+LIT_BOOL_FALSE = "false";
+LIT_BOOL_TRUE = "true";
+LIT_BYTE = "0x[0-9A-Fa-f]{2}";
+
+# This goes after all the builtins
+NAME = "[\l\u][\l\u\d_]*";

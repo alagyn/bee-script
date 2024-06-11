@@ -1,0 +1,51 @@
+
+def main() -> int
+{
+    x: int = 0;
+    y: str = "asdf";
+    # z: float = 0.5;
+
+    # test if-elif-else
+    if (x == 0)
+    {
+        # z = z + 0.2;
+        x = 5;
+    }
+    elif (x == 1)
+    {
+        x = 2;
+    }
+    else
+    {
+        # z = 0.8;
+    }
+
+    # test if-else
+    if(x == 2)
+    {
+        x = 4;
+    }
+    else
+    {
+        x = 5;
+    }
+
+    # test standalone if
+    if(x == 1)
+    {
+        x = 3;
+    }
+
+    # test if-elif
+    if (x == 4)
+    {
+        x = 5;
+    }
+    elif (x == 5)
+    {
+        x = 6;
+    }
+
+
+    return x;
+}

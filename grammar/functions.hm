@@ -1,0 +1,38 @@
+func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
+    {
+        auto out = std::make_shared<DeclNode>();
+
+        out->name = $NAME;
+
+        auto funcType = std::make_shared<TypeNode>();
+        funcType->type = Type::Func;
+        funcType->subtype = std::static_pointer_cast<TypeNode>($type);
+        funcType->args = std::static_pointer_cast<ArgList>($arg_def_list);
+
+        out->type = funcType;
+        out->code = std::static_pointer_cast<StmtNode>($block);
+
+        return out;
+    }
+    ;
+
+arg_def_list
+    = arg_def arg_def_list
+    {
+        $arg_def->next = $arg_def_list;
+        return $arg_def;
+    }
+    | EMPTY
+    {
+        return nullptr;
+    }
+    ;
+
+arg_def = NAME COLON type
+    {
+        auto out = std::make_shared<ArgList>();
+        out->type = std::static_pointer_cast<TypeNode>($type);
+        out->name = $NAME;
+        return out;
+    }
+    ;

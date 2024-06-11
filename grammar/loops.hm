@@ -1,0 +1,31 @@
+for_clause 
+    = KW_FOR OPEN_PAREN for_init_stmt SEMICOLON for_check_stmt SEMICOLON for_update_stmt CLOSE_PAREN block
+    {
+        auto out = std::make_shared<StmtNode>();
+
+        out->kind = StmtType::For;
+        out->initExpr = std::static_pointer_cast<ExprNode>($for_init_stmt);
+        out->expr = std::static_pointer_cast<ExprNode>($for_check_stmt);
+        out->nextExpr = std::static_pointer_cast<ExprNode>($for_update_stmt);
+        out->body = std::static_pointer_cast<StmtNode>($block);
+
+        return out;
+    }
+    ;
+
+for_init_stmt
+    = expr
+    | EMPTY
+    { return nullptr; }
+    ;
+
+for_check_stmt
+    = expr
+    | EMPTY
+    { return nullptr; }
+    ;
+
+for_update_stmt
+    = expr
+    | EMPTY { return nullptr; }
+    ;

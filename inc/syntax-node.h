@@ -1,21 +1,43 @@
 #pragma once
 
 #include <memory>
+#include <string>
+
+enum class SymbolType
+{
+    Local,
+    Global,
+    Param
+};
+
+class TypeNode;
+using TypeNodePtr = std::shared_ptr<TypeNode>;
+
+class Symbol
+{
+public:
+    SymbolType kind;
+    TypeNodePtr type;
+    std::string name;
+    int which;
+};
+
+using SymbolPtr = std::shared_ptr<Symbol>;
 
 class SyntaxNode
 {
 public:
     std::shared_ptr<SyntaxNode> next;
+    std::shared_ptr<Symbol> symbol;
 };
 
 class StmtNode;
 class DeclNode;
-class TypeNode;
+
 class ExprNode;
 
 using SyntaxNodePtr = std::shared_ptr<SyntaxNode>;
 using DeclNodePtr = std::shared_ptr<DeclNode>;
-using TypeNodePtr = std::shared_ptr<TypeNode>;
 using StmtNodePtr = std::shared_ptr<StmtNode>;
 using ExprNodePtr = std::shared_ptr<ExprNode>;
 
@@ -35,17 +57,18 @@ public:
     TypeNodePtr type;
 };
 
+using ArgListPtr = std::shared_ptr<ArgList>;
+
 class TypeNode : public SyntaxNode
 {
 public:
     Type type;
     TypeNodePtr subtype;
-    std::shared_ptr<ArgList> args;
+    ArgListPtr args;
 };
 
 enum class StmtType
 {
-    Assign,
     Decl,
     Expr,
     For,
@@ -77,15 +100,16 @@ enum class ExprType
     Mod,
     Pow,
     Neg,
+    Assign,
 
     Name,
     Arg,
 
     LogAnd,
     LogOr,
-    LogNot,
     LogEqu,
     LogNeq,
+    LogNot,
 
     CmpLT,
     CmpLTEQ,
@@ -97,7 +121,8 @@ enum class ExprType
 
     LitInt,
     LitBool,
-    LitStr
+    LitStr,
+    LitByte
 };
 
 class ExprNode : public SyntaxNode
