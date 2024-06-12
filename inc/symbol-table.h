@@ -24,11 +24,13 @@ public:
     // Lookup symbol ONLY in the current scope
     SymbolPtr lookupLocal(const std::string& name);
 
+    void resolve(SyntaxNodePtr node);
+
+private:
     void resolveDecl(DeclNodePtr node);
     void resolveStmt(StmtNodePtr node);
-    void resolveNext(SyntaxNodePtr node);
     void resolveExpr(ExprNodePtr node);
-    void resolveArgList(ArgListPtr args);
+    void resolveArgList(ArgListPtr args, int index = 0);
 
 private:
     std::deque<std::map<std::string, SymbolPtr>> scopes;

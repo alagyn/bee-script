@@ -5,7 +5,7 @@ func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
         out->name = $NAME;
 
         auto funcType = std::make_shared<TypeNode>();
-        funcType->type = Type::Func;
+        funcType->type = PrimitiveType::Func;
         funcType->subtype = std::static_pointer_cast<TypeNode>($type);
         funcType->args = std::static_pointer_cast<ArgList>($arg_def_list);
 

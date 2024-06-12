@@ -81,7 +81,7 @@ void SymbolTable::resolveDecl(DeclNodePtr node)
         exitScope();
     }
 
-    resolveNext(node);
+    resolve(node->next);
 }
 
 void SymbolTable::resolveStmt(StmtNodePtr node)
@@ -118,31 +118,35 @@ void SymbolTable::resolveStmt(StmtNodePtr node)
         exitScope();
         break;
     default:
-        throw std::runtime_error("Invalid StmtType");
+        throw std::runtime_error(
+            "Invalid StmtType: " + getStmtTypeName(node->kind)
+        );
     }
 
-    resolveNext(node);
+    resolve(node->next);
 }
 
-void SymbolTable::resolveNext(SyntaxNodePtr node)
+void SymbolTable::resolve(SyntaxNodePtr node)
 {
-    if(node->next)
+    if(!node)
     {
-        // TODO fix this, can't dynamic cast because SyntaxNode
-        // doesn't have any virtual funcs and is therefore not polymorphic
-        auto nextDecl = std::dynamic_pointer_cast<DeclNode>(node->next);
-        if(nextDecl)
-        {
-            resolveDecl(nextDecl);
-            return;
-        }
-
-        auto nextStmt = std::dynamic_pointer_cast<StmtNode>(node->next);
-        if(nextStmt)
-        {
-            resolveStmt(nextStmt);
-            return;
-        }
+        return;
+    }
+    switch(node->nodeType)
+    {
+    case NodeType::Decl:
+        resolveDecl(std::static_pointer_cast<DeclNode>(node));
+        break;
+    case NodeType::Stmt:
+        resolveStmt(std::static_pointer_cast<StmtNode>(node));
+        break;
+    case NodeType::Expr:
+        resolveExpr(std::static_pointer_cast<ExprNode>(node));
+        break;
+    default:
+        throw std::runtime_error(
+            "Invalid NodeType: " + getNodeTypeName(node->nodeType)
+        );
     }
 }
 
@@ -162,6 +166,24 @@ void SymbolTable::resolveExpr(ExprNodePtr node)
         resolveExpr(node->left);
         resolveExpr(node->right);
     }
+}
+
+void SymbolTable::resolveArgList(ArgListPtr args, int index)
+{
+    if(!args)
+    {
+        return;
+    }
+
+    auto out = std::make_shared<Symbol>();
+    out->kind = SymbolType::Param;
+    out->name = args->name;
+    out->which = index;
+
+    bind(out);
+    args->symbol = out;
+
+    resolveArgList(std::static_pointer_cast<ArgList>(args->next), index + 1);
 }
 
 } //namespace bees

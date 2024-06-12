@@ -3,6 +3,8 @@
 %header %%
 #include <memory>
 #include <syntax-node.h>
+
+using namespace bees;
 %%
 
 # Line comments
@@ -35,8 +37,7 @@ top_level_def
 
 block = OPEN_CURLY stmt_list CLOSE_CURLY
     {
-        auto out = std::make_shared<StmtNode>();
-        out->kind = StmtType::Block;
+        auto out = std::make_shared<StmtNode>(StmtType::Block);
         out->body = std::static_pointer_cast<StmtNode>($stmt_list);
         return out;
     }
@@ -84,15 +85,13 @@ stmt
 basic_stmt
     = expr
     {
-        auto out = std::make_shared<StmtNode>();
-        out->kind = StmtType::Expr;
+        auto out = std::make_shared<StmtNode>(StmtType::Expr);
         out->expr = std::static_pointer_cast<ExprNode>($expr);
         return out;
     }
     | KW_RETURN expr
     {
-        auto out = std::make_shared<StmtNode>();
-        out->kind = StmtType::Return;
+        auto out = std::make_shared<StmtNode>(StmtType::Return);
         out->expr = std::static_pointer_cast<ExprNode>($expr);
         return out;
     }

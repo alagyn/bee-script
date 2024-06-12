@@ -4,6 +4,10 @@
 #include <hermes/beescript_loader.h>
 #include <hermes/errors.h>
 
+#include <symbol-table.h>
+
+using namespace bees;
+
 int main(int argc, char** argv)
 {
     if(argc != 2)
@@ -21,9 +25,21 @@ int main(int argc, char** argv)
         auto parser = hermes::load_beescript();
         root = parser->parse(input);
     }
-    catch(const HermesError& err)
+    catch(const std::exception& err)
     {
-        std::cout << "Error: " << err.what() << std::endl;
+        std::cout << "Error Parsing: " << err.what() << std::endl;
+        return 1;
+    }
+
+    SymbolTable symbolTable;
+
+    try
+    {
+        symbolTable.resolve(root);
+    }
+    catch(const std::exception& err)
+    {
+        std::cout << "Error resolving: " << err.what() << std::endl;
         return 1;
     }
 

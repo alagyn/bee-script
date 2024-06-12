@@ -3,45 +3,46 @@
 #include <memory>
 #include <string>
 
-enum class SymbolType
+#include <symbol.h>
+
+namespace bees {
+
+enum class NodeType
 {
-    Local,
-    Global,
-    Param
+    ArgList,
+    Decl,
+    Stmt,
+    Expr,
+    Type
 };
 
-class TypeNode;
-using TypeNodePtr = std::shared_ptr<TypeNode>;
-
-class Symbol
-{
-public:
-    SymbolType kind;
-    TypeNodePtr type;
-    std::string name;
-    int which;
-};
-
-using SymbolPtr = std::shared_ptr<Symbol>;
+std::string getNodeTypeName(NodeType type);
 
 class SyntaxNode
 {
 public:
+    const NodeType nodeType;
+    SyntaxNode(NodeType nodeType);
     std::shared_ptr<SyntaxNode> next;
     std::shared_ptr<Symbol> symbol;
 };
 
-class StmtNode;
-class DeclNode;
-
-class ExprNode;
-
 using SyntaxNodePtr = std::shared_ptr<SyntaxNode>;
-using DeclNodePtr = std::shared_ptr<DeclNode>;
+
+class StmtNode;
+class ExprNode;
+class TypeNode;
+class DeclNode;
+class ArgList;
+
+using TypeNodePtr = std::shared_ptr<TypeNode>;
 using StmtNodePtr = std::shared_ptr<StmtNode>;
 using ExprNodePtr = std::shared_ptr<ExprNode>;
+using DeclNodePtr = std::shared_ptr<DeclNode>;
+using ArgListPtr = std::shared_ptr<ArgList>;
 
-enum class Type
+// TYPE NODE -------------------------------------------------
+enum class PrimitiveType
 {
     Int,
     Str,
@@ -50,23 +51,27 @@ enum class Type
     Array
 };
 
+std::string getPrimitiveTypeName(PrimitiveType type);
+
 class ArgList : public SyntaxNode
 {
 public:
+    ArgList();
     std::string name;
     TypeNodePtr type;
 };
 
-using ArgListPtr = std::shared_ptr<ArgList>;
-
 class TypeNode : public SyntaxNode
 {
 public:
-    Type type;
+    TypeNode();
+
+    PrimitiveType type;
     TypeNodePtr subtype;
     ArgListPtr args;
 };
 
+// STMT NODE -------------------------------------------------
 enum class StmtType
 {
     Decl,
@@ -77,9 +82,13 @@ enum class StmtType
     Block
 };
 
+std::string getStmtTypeName(StmtType type);
+
 class StmtNode : public SyntaxNode
 {
 public:
+    StmtNode(StmtType kind);
+
     StmtType kind;
     DeclNodePtr decl;
     ExprNodePtr initExpr;
@@ -89,6 +98,7 @@ public:
     StmtNodePtr elseBody;
 };
 
+// EXPR NODE -------------------------------------------------
 enum class ExprType
 {
     Error,
@@ -125,6 +135,8 @@ enum class ExprType
     LitByte
 };
 
+std::string getExprTypeName(ExprType type);
+
 class ExprNode : public SyntaxNode
 {
 public:
@@ -135,23 +147,20 @@ public:
     int intValue;
     std::string strValue;
 
-    ExprNode()
-    {
-    }
-
-    ExprNode(ExprType type, SyntaxNodePtr left, SyntaxNodePtr right)
-        : type(type)
-        , left(std::static_pointer_cast<ExprNode>(left))
-        , right(std::static_pointer_cast<ExprNode>(right))
-    {
-    }
+    ExprNode();
+    ExprNode(ExprType type, SyntaxNodePtr left, SyntaxNodePtr right);
 };
 
+// DECL NODE -------------------------------------------------
 class DeclNode : public SyntaxNode
 {
 public:
+    DeclNode();
+
     std::string name;
     TypeNodePtr type;
     ExprNodePtr value;
     StmtNodePtr code;
 };
+
+} //namespace bees

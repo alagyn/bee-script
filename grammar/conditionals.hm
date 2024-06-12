@@ -33,8 +33,7 @@ if_stmt
 if_clause
     = KW_IF OPEN_PAREN expr CLOSE_PAREN block
     {
-        auto out = std::make_shared<StmtNode>();
-        out->kind = StmtType::IfElse;
+        auto out = std::make_shared<StmtNode>(StmtType::IfElse);
         out->expr = std::static_pointer_cast<ExprNode>($expr);
         out->body = std::static_pointer_cast<StmtNode>($block);
         return out;
@@ -54,8 +53,7 @@ elif_clauses
 elif_clause
     = KW_ELIF OPEN_PAREN expr CLOSE_PAREN block
     {
-        auto out = std::make_shared<StmtNode>();
-        out->kind = StmtType::IfElse;
+        auto out = std::make_shared<StmtNode>(StmtType::IfElse);
         out->expr = std::static_pointer_cast<ExprNode>($expr);
         out->body = std::static_pointer_cast<StmtNode>($block);
         return out;
