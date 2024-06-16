@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include <symbol.h>
+#include <beescript/symbol.h>
 
 namespace bees {
 
@@ -44,6 +44,9 @@ using ArgListPtr = std::shared_ptr<ArgList>;
 // TYPE NODE -------------------------------------------------
 enum class PrimitiveType
 {
+    Error,
+    Void,
+    Byte,
     Int,
     Str,
     Bool,
@@ -69,6 +72,12 @@ public:
     PrimitiveType type;
     TypeNodePtr subtype;
     ArgListPtr args;
+    size_t size;
+
+    bool equals(const TypeNodePtr other);
+    bool equals(const TypeNode& other);
+
+    std::string toStr();
 };
 
 // STMT NODE -------------------------------------------------
@@ -91,9 +100,9 @@ public:
 
     StmtType kind;
     DeclNodePtr decl;
-    ExprNodePtr initExpr;
-    ExprNodePtr expr;
-    ExprNodePtr nextExpr;
+    ExprNodePtr initExpr; //for loop init
+    ExprNodePtr expr; // for loop check, if check
+    ExprNodePtr nextExpr; // for loop update
     StmtNodePtr body;
     StmtNodePtr elseBody;
 };
@@ -132,7 +141,8 @@ enum class ExprType
     LitInt,
     LitBool,
     LitStr,
-    LitByte
+    LitByte,
+    LitArray
 };
 
 std::string getExprTypeName(ExprType type);

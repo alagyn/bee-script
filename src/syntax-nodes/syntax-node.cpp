@@ -1,4 +1,6 @@
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
+
+#include <beescript/errors.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -27,7 +29,7 @@ std::string getNodeTypeName(NodeType type)
     default:
         std::stringstream ss;
         ss << "Unknown NodeType (" << static_cast<unsigned>(type) << ")";
-        throw std::runtime_error(ss.str());
+        throw BeeError(ss.str());
     }
 }
 

@@ -1,4 +1,6 @@
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
+
+#include <beescript/errors.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -74,10 +76,12 @@ std::string getExprTypeName(ExprType type)
         return "LitStr";
     case ExprType::LitByte:
         return "LitByte";
+    case ExprType::LitArray:
+        return "LitArray";
     default:
         std::stringstream ss;
         ss << "Unknown ExprType (" << static_cast<unsigned>(type) << ")";
-        throw std::runtime_error(ss.str());
+        throw BeeError(ss.str());
     }
 }
 

@@ -1,4 +1,6 @@
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
+
+#include <beescript/errors.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -30,7 +32,7 @@ std::string getStmtTypeName(StmtType type)
     default:
         std::stringstream ss;
         ss << "Unknown StmtType (" << static_cast<unsigned>(type) << ")";
-        throw std::runtime_error(ss.str());
+        throw BeeError(ss.str());
     }
 }
 

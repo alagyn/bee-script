@@ -4,7 +4,8 @@
 #include <hermes/beescript_loader.h>
 #include <hermes/errors.h>
 
-#include <symbol-table.h>
+#include <beescript/symbol-table.h>
+#include <beescript/type-check.h>
 
 using namespace bees;
 
@@ -40,6 +41,16 @@ int main(int argc, char** argv)
     catch(const std::exception& err)
     {
         std::cout << "Error resolving: " << err.what() << std::endl;
+        return 1;
+    }
+
+    try
+    {
+        typeCheck(root);
+    }
+    catch(const std::exception& err)
+    {
+        std::cout << "Error type-checking: " << err.what() << std::endl;
         return 1;
     }
 

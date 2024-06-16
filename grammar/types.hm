@@ -3,6 +3,7 @@ type
     {
         auto out = std::make_shared<TypeNode>();
         out->type = PrimitiveType::Array;
+        out->size = std::stoi($LIT_INT);
         out->subtype = std::static_pointer_cast<TypeNode>($type_name);
         return out;
     }
@@ -26,6 +27,12 @@ type_name
     {
         auto out = std::make_shared<TypeNode>();
         out->type = PrimitiveType::Bool;
+        return out;
+    }
+    | TYPE_VOID
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->type = PrimitiveType::Void;
         return out;
     }
     ;

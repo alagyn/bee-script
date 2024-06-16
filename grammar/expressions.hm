@@ -64,6 +64,24 @@ func_or_sub
     | bottom_val
     ;
 
+arg_call_list
+    = argument COMMA arg_call_list
+    {
+        auto out = std::static_pointer_cast<ExprNode>($argument);
+        out->right = std::static_pointer_cast<ExprNode>($arg_call_list);
+        return out;
+    }
+    | argument
+    ;
+
+argument = expr
+    {
+        // Turn expr into an arg node
+        auto out = std::make_shared<ExprNode>(ExprType::Arg, $expr, nullptr);
+        return out;
+    }
+    ;
+
 bottom_val
     = loc
     | LIT_INT
@@ -91,6 +109,7 @@ bottom_val
         out->intValue = std::stoi(temp.substr(2, temp.size()), nullptr, 16);
         return out;
     }
+    | lit_array
     ;
 
 loc 
@@ -101,5 +120,32 @@ loc
         out->type = ExprType::Name;
         out->name = $0;
         return out;
+    }
+    ;
+
+lit_bool 
+    = LIT_BOOL_FALSE
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitBool;
+        out->intValue = 0;
+        return out;
+    }
+    | LIT_BOOL_TRUE
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitBool;
+        out->intValue = 1;
+        return out;
+    }
+    ;
+
+lit_array = OPEN_SQUARE arg_call_list CLOSE_SQUARE
+    {
+        return std::make_shared<ExprNode>(
+            ExprType::LitArray,
+            std::static_pointer_cast<ExprNode>($arg_call_list), 
+            nullptr
+        );
     }
     ;

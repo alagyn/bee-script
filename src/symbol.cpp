@@ -1,4 +1,6 @@
-#include <symbol.h>
+#include <beescript/symbol.h>
+
+#include <beescript/errors.h>
 
 #include <stdexcept>
 
@@ -14,7 +16,7 @@ std::string getSymbolTypeName(SymbolType type)
     case SymbolType::Param:
         return "Param";
     default:
-        throw std::runtime_error("Unknown SymbolType");
+        throw BeeError("Unknown SymbolType");
     }
 }
 } //namespace bees

@@ -1,4 +1,4 @@
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
 
 namespace bees {
 

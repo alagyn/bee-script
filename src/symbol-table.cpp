@@ -1,4 +1,6 @@
-#include <symbol-table.h>
+#include <beescript/symbol-table.h>
+
+#include <beescript/errors.h>
 
 #include <stdexcept>
 
@@ -118,9 +120,7 @@ void SymbolTable::resolveStmt(StmtNodePtr node)
         exitScope();
         break;
     default:
-        throw std::runtime_error(
-            "Invalid StmtType: " + getStmtTypeName(node->kind)
-        );
+        throw BeeError("Invalid StmtType: " + getStmtTypeName(node->kind));
     }
 
     resolve(node->next);
@@ -144,9 +144,7 @@ void SymbolTable::resolve(SyntaxNodePtr node)
         resolveExpr(std::static_pointer_cast<ExprNode>(node));
         break;
     default:
-        throw std::runtime_error(
-            "Invalid NodeType: " + getNodeTypeName(node->nodeType)
-        );
+        throw BeeError("Invalid NodeType: " + getNodeTypeName(node->nodeType));
     }
 }
 

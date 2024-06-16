@@ -1,5 +1,5 @@
 #pragma once
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
 
 #include <deque>
 #include <map>

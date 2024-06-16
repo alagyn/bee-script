@@ -17,9 +17,12 @@ add_hermes_grammar(
 )
 
 add_executable(bees
+    src/errors.cpp
     src/main.cpp
     src/symbol.cpp
     src/symbol-table.cpp
+    src/type-check.cpp
+    
     src/syntax-nodes/decl-node.cpp
     src/syntax-nodes/expr-node.cpp
     src/syntax-nodes/stmt-node.cpp

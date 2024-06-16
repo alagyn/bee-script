@@ -39,6 +39,7 @@ TYPE_INT = "int";
 TYPE_BOOL = "bool";
 TYPE_STR = "str";
 TYPE_BYTE = "byte";
+TYPE_VOID = "void";
 
 LIT_INT = "-?\d+";
 LIT_STR = '"([^"]|(\\"))*"';

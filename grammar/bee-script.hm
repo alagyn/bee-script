@@ -2,7 +2,7 @@
 
 %header %%
 #include <memory>
-#include <syntax-node.h>
+#include <beescript/syntax-node.h>
 
 using namespace bees;
 %%
@@ -30,7 +30,6 @@ top_level_def
 %import conditionals.hm
 %import expressions.hm
 %import functions.hm
-%import literals.hm
 %import loops.hm
 %import terminals.hm
 %import types.hm
@@ -57,7 +56,20 @@ stmt_list
     }
     ;
 
+stmt
+    = var_def
+    {
+        // Wrap var def in stmt node
+        auto out = std::make_shared<StmtNode>(StmtType::Decl);
+        out->decl = std::static_pointer_cast<DeclNode>($var_def);
+        return out;
+    }
+    | if_stmt
+    | for_clause
+    | basic_stmt SEMICOLON
+    ;
 
+# separate so we can have global vars but not global statements
 var_def = NAME COLON type OP_ASSIGN expr SEMICOLON
     {
         auto out = std::make_shared<DeclNode>();
@@ -75,13 +87,6 @@ var_def = NAME COLON type OP_ASSIGN expr SEMICOLON
     }
     ;
 
-stmt
-    = var_def
-    | if_stmt
-    | for_clause
-    | basic_stmt SEMICOLON
-    ;
-
 basic_stmt
     = expr
     {
@@ -95,14 +100,4 @@ basic_stmt
         out->expr = std::static_pointer_cast<ExprNode>($expr);
         return out;
     }
-    ;
-
-arg_call_list
-    = expr COMMA arg_call_list
-    {
-        auto out = std::static_pointer_cast<ExprNode>($expr);
-        out->right = std::static_pointer_cast<ExprNode>($arg_call_list);
-        return out;
-    }
-    | expr
     ;
