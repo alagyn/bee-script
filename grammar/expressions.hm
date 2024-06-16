@@ -110,8 +110,35 @@ bottom_val
     {
         auto out = std::make_shared<ExprNode>();
         out->type = ExprType::LitByte;
-        std::string temp = $0;
+        const std::string& temp = $0;
         out->intValue = std::stoi(temp.substr(2, temp.size()), nullptr, 16);
+        return out;
+    }
+    | LIT_CHAR
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitByte;
+        const std::string& temp = $0;
+        if(temp[1] == '\\')
+        {
+            switch(temp[2])
+            {
+            case 'n':
+                out->intValue = static_cast<int>('\n');
+                break;
+            case 't':
+                out->intValue = static_cast<int>('\t');
+                break;
+            default:
+                out->intValue = static_cast<int>(temp[2]);
+                break;
+            }
+        }
+        else
+        {
+            out->intValue = static_cast<int>(temp[1]);
+        }
+
         return out;
     }
     | lit_array

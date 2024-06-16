@@ -31,9 +31,6 @@ public:
         auto out = std::make_shared<TypeNode>();
 
         // TODO errors needs location
-        // TODO errors replace getPrimitiveTypeName with something smarter to build
-        // complex types
-        // TODO errors need to not raise exceptions, return an invalid error type
 
         switch(node->type)
         {
@@ -145,7 +142,7 @@ public:
             {
                 std::cerr << "Cannot compare type " << lType->toStr() << " and "
                           << rType->toStr() << std::endl;
-                out->primType = PrimitiveType::Invalid;
+                //out->primType = PrimitiveType::Invalid;
                 error = true;
                 break;
             }
@@ -157,7 +154,7 @@ public:
             {
                 std::cerr << "Cannot compare type " << lType->toStr()
                           << std::endl;
-                out->primType = PrimitiveType::Invalid;
+                //out->primType = PrimitiveType::Invalid;
                 error = true;
                 break;
             }
@@ -232,7 +229,8 @@ public:
         }
 
         case ExprType::Subscript:
-            if(lType->primType != PrimitiveType::Array)
+            if(lType->primType != PrimitiveType::Array
+               && lType->primType != PrimitiveType::Str)
             {
                 std::cerr << "Cannot subscript non-array type "
                           << lType->toStr() << std::endl;
@@ -249,8 +247,17 @@ public:
                 out->primType = PrimitiveType::Invalid;
                 break;
             }
-            out = lType->subtype;
-            out->ref = true;
+            if(lType->primType == PrimitiveType::Array)
+            {
+                out = lType->subtype;
+                out->ref = true;
+            }
+            else // is string
+            {
+                out->primType = PrimitiveType::Byte;
+                out->ref = true;
+            }
+
             break;
 
         case ExprType::LitInt:
@@ -273,9 +280,10 @@ public:
             out->primType = PrimitiveType::Array;
             out->subtype = nullptr;
             ExprNodePtr value = node->left;
-
+            size_t numValues = 0;
             while(value)
             {
+                ++numValues;
                 TypeNodePtr t = typeCheckExpr(value->left);
                 if(!out->subtype)
                 {
@@ -291,6 +299,8 @@ public:
 
                 value = value->right;
             }
+
+            out->size = numValues;
 
             break;
         }
@@ -359,8 +369,9 @@ public:
                 TypeNodePtr t = typeCheckExpr(node->expr);
                 if(t->primType != PrimitiveType::Bool)
                 {
-                    std::cerr << "Invalid if expr, expected Bool, got "
-                              << t->toStr() << std::endl;
+                    std::cerr << "Invalid if expr, expected bool, got "
+                              << t->toStr() << " (" << node->expr->toStr()
+                              << ")" << std::endl;
                     error = true;
                 }
 
@@ -414,23 +425,26 @@ public:
             break;
         case PrimitiveType::Array:
         {
-            if(node->value->type != ExprType::LitArray)
+            if(node->value)
             {
-                std::cerr << "Cannot initialize var (" << node->toStr()
-                          << ") with value (" << node->value->toStr()
-                          << "). Value is not array: " << std::endl;
-                error = true;
+                TypeNodePtr t = typeCheckExpr(node->value);
+                if(!node->type->equals(t))
+                {
+                    std::cerr << "Cannot initialize var (" << node->toStr()
+                              << ") with type (" << t->toStr() << ")"
+                              << std::endl;
+                    error = true;
+                    break;
+                }
+                if(node->type->size != 0 && node->type->size != t->size)
+                {
+                    std::cerr
+                        << "Warning: initializing array (" << node->toStr()
+                        << ") with different sized literal (" << t->toStr()
+                        << ")" << std::endl;
+                    // Not an error, just a warning
+                }
             }
-
-            TypeNodePtr t = typeCheckExpr(node->value);
-            if(!node->type->equals(t))
-            {
-                std::cerr << "Cannot initialize var (" << node->toStr()
-                          << ") with wrong array literal type (" << t->toStr()
-                          << ")" << std::endl;
-                error = true;
-            }
-
             break;
         }
         }
