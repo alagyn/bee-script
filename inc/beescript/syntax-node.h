@@ -47,7 +47,7 @@ using ArgListPtr = std::shared_ptr<ArgList>;
 // TYPE NODE -------------------------------------------------
 enum class PrimitiveType
 {
-    Error,
+    Invalid,
     Void,
     Byte,
     Int,
@@ -78,6 +78,7 @@ public:
     TypeNodePtr subtype;
     ArgListPtr args;
     size_t size;
+    bool ref; // Flag if this value is assignable
 
     bool equals(const TypeNodePtr other);
     bool equals(const TypeNode& other);

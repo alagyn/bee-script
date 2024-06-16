@@ -168,10 +168,14 @@ void SymbolTable::resolveExpr(ExprNodePtr node)
         SymbolPtr s = lookup(node->name);
         if(!s)
         {
-            std::stringstream ss;
-            ss << "Unbound symbol: " << node->name;
-            throw BeeError(ss.str());
+            std::cerr << "Unbound symbol: " << node->name << std::endl;
+            s = std::make_shared<Symbol>();
+            s->name = node->name;
+            s->kind = SymbolType::Local;
+            s->which = 0;
+            bind(s);
         }
+
         node->symbol = s;
     }
     else

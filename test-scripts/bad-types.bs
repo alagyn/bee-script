@@ -1,4 +1,55 @@
+def myFunc(x: int, y: str, z: int[]) -> int
+{
+
+    return "asdf";
+}
+
+def space() -> void
+{
+    # nothing
+}
+
 def main() -> int
 {
     x: int = "sdf";
+
+    y: int[5] = [1, "a", 0xF1];
+
+    z: byte = 0x12;
+    z = 0x31;
+    z = 5;
+    z = "asdf";
+
+    0 = 5;
+
+    myArray: int[5] = [0, 0, 0, 0, 0];
+    myArray[2] = 4;
+    myArray[1] = "a";
+    myArray["a"] = 5;
+    myArray[x] = 5;
+    
+    myFunc(1, "asdf", [5, 4]);
+    myFunc("a", "Asdf", []);
+
+    myFunc();
+
+    bad: void;
+
+    space();
+    space("a");
+
+    i: int;
+    for(i = 0; i < 5; i = i + 1)
+    {
+        x = x - 1;
+    }
+
+    for(notreal; i; space())
+    {
+        x = x + 1;
+        s = z;
+        x = z;
+    }
+
+    return 1;
 }

@@ -11,20 +11,22 @@ std::string getPrimitiveTypeName(PrimitiveType type)
 {
     switch(type)
     {
+    case PrimitiveType::Invalid:
+        return "Invalid-Type";
     case PrimitiveType::Void:
-        return "Void";
+        return "void";
     case PrimitiveType::Byte:
-        return "Byte";
+        return "byte";
     case PrimitiveType::Int:
-        return "Int";
+        return "int";
     case PrimitiveType::Str:
-        return "Str";
+        return "str";
     case PrimitiveType::Bool:
-        return "Bool";
+        return "bool";
     case PrimitiveType::Func:
-        return "Func";
+        return "func";
     case PrimitiveType::Array:
-        return "Array";
+        return "array";
     default:
         std::stringstream ss;
         ss << "Unknown PrimitiveType (" << static_cast<unsigned>(type) << ")";
@@ -39,6 +41,7 @@ ArgList::ArgList()
 
 TypeNode::TypeNode()
     : SyntaxNode(NodeType::Type)
+    , primType(PrimitiveType::Invalid)
 {
 }
 
@@ -95,6 +98,10 @@ bool TypeNode::equals(const TypeNode& other)
 std::string TypeNode::toStr()
 {
     std::stringstream ss;
+    if(ref)
+    {
+        ss << "&";
+    }
     switch(primType)
     {
     case PrimitiveType::Array:
@@ -124,7 +131,9 @@ std::string TypeNode::toStr()
 
 std::string ArgList::toStr()
 {
-    return "NotImpl";
+    std::stringstream ss;
+    ss << name << ": " << type->toStr();
+    return ss.str();
 }
 
 } //namespace bees

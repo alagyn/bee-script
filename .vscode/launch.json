@@ -11,7 +11,7 @@
             "cwd": "${workspaceFolder}",
             "program": "${workspaceRoot}/build/Debug/bees",
             "args": [
-                "test-scripts/syntax.bs"
+                "test-scripts/bad-types.bs"
             ],
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb",

@@ -4,6 +4,6 @@
 
 namespace bees {
 
-void typeCheck(SyntaxNodePtr node);
+bool typeCheck(SyntaxNodePtr node);
 
 }

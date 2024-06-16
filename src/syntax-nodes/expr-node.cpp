@@ -50,11 +50,11 @@ std::string ExprNode::toStr()
     case ExprType::LitArray:
     {
         ss << "[";
-        ExprNodePtr temp = right;
+        ExprNodePtr temp = left;
         while(temp)
         {
-            ss << temp->toStr();
-            temp = std::static_pointer_cast<ExprNode>(temp->next);
+            ss << temp->left->toStr();
+            temp = std::static_pointer_cast<ExprNode>(temp->right);
             if(temp)
             {
                 ss << ", ";
@@ -85,6 +85,8 @@ std::string ExprNode::toStr()
         ss << left->toStr() << "[" << right->toStr() << "]";
         return ss.str();
     }
+    case ExprType::Arg:
+        return left->toStr();
     }
 
     ss << left->toStr();

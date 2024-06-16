@@ -46,7 +46,11 @@ int main(int argc, char** argv)
 
     try
     {
-        typeCheck(root);
+        if(!typeCheck(root))
+        {
+            std::cout << "Error type-checking" << std::endl;
+            return 1;
+        }
     }
     catch(const std::exception& err)
     {

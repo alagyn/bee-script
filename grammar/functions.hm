@@ -1,4 +1,4 @@
-func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
+func_def = KW_DEF NAME OPEN_PAREN func_arg_defs CLOSE_PAREN ARROW type block
     {
         auto out = std::make_shared<DeclNode>();
 
@@ -7,7 +7,7 @@ func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
         auto funcType = std::make_shared<TypeNode>();
         funcType->primType = PrimitiveType::Func;
         funcType->subtype = std::static_pointer_cast<TypeNode>($type);
-        funcType->args = std::static_pointer_cast<ArgList>($arg_def_list);
+        funcType->args = std::static_pointer_cast<ArgList>($func_arg_defs);
 
         out->type = funcType;
         out->code = std::static_pointer_cast<StmtNode>($block);
@@ -16,16 +16,18 @@ func_def = KW_DEF NAME OPEN_PAREN arg_def_list CLOSE_PAREN ARROW type block
     }
     ;
 
+func_arg_defs 
+    = arg_def_list
+    | EMPTY { return nullptr; }
+    ;
+
 arg_def_list
-    = arg_def arg_def_list
+    = arg_def COMMA arg_def_list
     {
         $arg_def->next = $arg_def_list;
         return $arg_def;
     }
-    | EMPTY
-    {
-        return nullptr;
-    }
+    | arg_def
     ;
 
 arg_def = NAME COLON type

@@ -7,6 +7,14 @@ type
         out->subtype = std::static_pointer_cast<TypeNode>($type_name);
         return out;
     }
+    | type_name OPEN_SQUARE CLOSE_SQUARE
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->primType = PrimitiveType::Array;
+        out->size = 0;
+        out->subtype = std::static_pointer_cast<TypeNode>($type_name);
+        return out;
+    }
     | type_name
     ;
 
@@ -33,6 +41,12 @@ type_name
     {
         auto out = std::make_shared<TypeNode>();
         out->primType = PrimitiveType::Void;
+        return out;
+    }
+    | TYPE_BYTE
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->primType = PrimitiveType::Byte;
         return out;
     }
     ;
