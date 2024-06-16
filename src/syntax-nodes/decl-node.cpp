@@ -7,4 +7,11 @@ DeclNode::DeclNode()
 {
 }
 
+std::string DeclNode::toStr()
+{
+    std::stringstream ss;
+    ss << name << ": " << type->toStr();
+    return ss.str();
+}
+
 } //namespace bees

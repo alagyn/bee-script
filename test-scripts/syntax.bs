@@ -9,7 +9,7 @@ def main() -> int
     if (x == 0)
     {
         # z = z + 0.2;
-        x = 5;
+        x = x + 5;
     }
     elif (x == 1)
     {

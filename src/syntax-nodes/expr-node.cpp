@@ -20,6 +20,127 @@ ExprNode::ExprNode(ExprType type, SyntaxNodePtr left, SyntaxNodePtr right)
 {
 }
 
+std::string ExprNode::toStr()
+{
+    std::stringstream ss;
+
+    // Single arg expr
+    switch(type)
+    {
+    case ExprType::Neg:
+        ss << "-" << left->toStr();
+        return ss.str();
+    case ExprType::LogNot:
+        ss << "not " << left->toStr();
+        return ss.str();
+    case ExprType::Name:
+        return name;
+    case ExprType::LitInt:
+        ss << intValue;
+        return ss.str();
+    case ExprType::LitBool:
+        ss << (intValue ? "true" : "false");
+        return ss.str();
+    case ExprType::LitStr:
+        ss << "\"" << strValue << "\"";
+        return ss.str();
+    case ExprType::LitByte:
+        ss << intValue;
+        return ss.str();
+    case ExprType::LitArray:
+    {
+        ss << "[";
+        ExprNodePtr temp = right;
+        while(temp)
+        {
+            ss << temp->toStr();
+            temp = std::static_pointer_cast<ExprNode>(temp->next);
+            if(temp)
+            {
+                ss << ", ";
+            }
+        }
+
+        ss << "]";
+        return ss.str();
+    }
+    case ExprType::Call:
+    {
+        ss << left->toStr() << "(";
+        ExprNodePtr temp = right;
+        while(temp)
+        {
+            ss << temp->toStr();
+            temp = std::static_pointer_cast<ExprNode>(temp->next);
+            if(temp)
+            {
+                ss << ", ";
+            }
+        }
+        ss << ")";
+        return ss.str();
+    }
+    case ExprType::Subscript:
+    {
+        ss << left->toStr() << "[" << right->toStr() << "]";
+        return ss.str();
+    }
+    }
+
+    ss << left->toStr();
+    switch(type)
+    {
+    case ExprType::Add:
+        ss << " + ";
+        break;
+    case ExprType::Sub:
+        ss << " - ";
+        break;
+    case ExprType::Mul:
+        ss << " * ";
+        break;
+    case ExprType::Div:
+        ss << " / ";
+        break;
+    case ExprType::Mod:
+        ss << " % ";
+        break;
+    case ExprType::Pow:
+        ss << " ** ";
+        break;
+    case ExprType::Assign:
+        ss << " = ";
+        break;
+    case ExprType::CmpLT:
+        ss << " < ";
+        break;
+    case ExprType::CmpLTEQ:
+        ss << " <= ";
+        break;
+    case ExprType::CmpGT:
+        ss << " > ";
+        break;
+    case ExprType::CmpGTEQ:
+        ss << " >= ";
+        break;
+    case ExprType::LogAnd:
+        ss << " and ";
+        break;
+    case ExprType::LogOr:
+        ss << " or ";
+        break;
+    case ExprType::LogEqu:
+        ss << " == ";
+        break;
+    case ExprType::LogNeq:
+        ss << " != ";
+        break;
+    }
+
+    ss << right->toStr();
+    return ss.str();
+}
+
 std::string getExprTypeName(ExprType type)
 {
     switch(type)

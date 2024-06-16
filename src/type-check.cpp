@@ -47,11 +47,11 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
     switch(node->type)
     {
     case ExprType::Add:
-        if(lType->type == PrimitiveType::Str)
+        if(lType->primType == PrimitiveType::Str)
         {
             // String concat
             // TODO rhs checks?
-            out->type = PrimitiveType::Str;
+            out->primType = PrimitiveType::Str;
             break;
         }
         // Else fall through
@@ -61,8 +61,8 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
     case ExprType::Mod:
     case ExprType::Pow:
         // TODO more arithmetic types
-        if(lType->type != PrimitiveType::Int
-           || rType->type != PrimitiveType::Int)
+        if(lType->primType != PrimitiveType::Int
+           || rType->primType != PrimitiveType::Int)
         {
             std::stringstream ss;
             ss << "Operator " << getExprTypeName(node->type)
@@ -72,25 +72,25 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
             throw BeeError(ss.str());
         }
         // Output must be int
-        out->type = lType->type;
+        out->primType = lType->primType;
         break;
     case ExprType::Neg:
-        if(lType->type != PrimitiveType::Int
-           || lType->type != PrimitiveType::Byte)
+        if(lType->primType != PrimitiveType::Int
+           || lType->primType != PrimitiveType::Byte)
         {
             std::stringstream ss;
             ss << "Cannot negate type " << lType->toStr();
             throw BeeError(ss.str());
         }
 
-        out->type = lType->type;
+        out->primType = lType->primType;
         break;
 
     case ExprType::LogAnd:
     case ExprType::LogOr:
         // types must be boolean
-        if(lType->type != PrimitiveType::Bool
-           || rType->type != PrimitiveType::Bool)
+        if(lType->primType != PrimitiveType::Bool
+           || rType->primType != PrimitiveType::Bool)
         {
             std::stringstream ss;
             ss << "Boolean operator " << getExprTypeName(node->type)
@@ -99,23 +99,29 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
             throw BeeError(ss.str());
         }
 
-        out->type = PrimitiveType::Bool;
+        out->primType = PrimitiveType::Bool;
         break;
 
     case ExprType::LogNot:
-        if(lType->type != PrimitiveType::Bool
-           || lType->type != PrimitiveType::Byte)
+        if(lType->primType != PrimitiveType::Bool
+           || lType->primType != PrimitiveType::Byte)
         {
             std::stringstream ss;
             ss << "Cannot negate type " << lType->toStr();
             throw BeeError(ss.str());
         }
-        out->type = lType->type;
+        out->primType = lType->primType;
         break;
 
     case ExprType::Name:
         // Output type is the type set in the name resolution step;
         out = node->symbol->type;
+        if(!out)
+        {
+            std::stringstream ss;
+            ss << "Name has unknown type: " << node->toStr();
+            throw BeeError(ss.str());
+        }
         break;
 
     case ExprType::CmpLT:
@@ -131,7 +137,7 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
                << rType->toStr();
             throw BeeError(ss.str());
         }
-        switch(lType->type)
+        switch(lType->primType)
         {
         case PrimitiveType::Void:
         case PrimitiveType::Func:
@@ -143,12 +149,12 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
         }
         }
 
-        out->type = PrimitiveType::Bool;
+        out->primType = PrimitiveType::Bool;
         break;
 
     case ExprType::Call:
     {
-        if(lType->type != PrimitiveType::Func)
+        if(lType->primType != PrimitiveType::Func)
         {
             std::stringstream ss;
             ss << "Cannot call non-func type " << lType->toStr();
@@ -186,14 +192,14 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
     }
 
     case ExprType::Subscript:
-        if(lType->type != PrimitiveType::Array)
+        if(lType->primType != PrimitiveType::Array)
         {
             std::stringstream ss;
             ss << "Cannot subscript non-array type " << lType->toStr();
             throw BeeError(ss.str());
         }
-        if(rType->type != PrimitiveType::Int
-           || rType->type != PrimitiveType::Byte)
+        if(rType->primType != PrimitiveType::Int
+           || rType->primType != PrimitiveType::Byte)
         {
             std::stringstream ss;
             ss << "Invalid type as subscript index: " << rType->toStr();
@@ -203,24 +209,24 @@ TypeNodePtr typeCheckExpr(ExprNodePtr node)
         break;
 
     case ExprType::LitInt:
-        out->type = PrimitiveType::Int;
+        out->primType = PrimitiveType::Int;
         break;
 
     case ExprType::LitBool:
-        out->type = PrimitiveType::Bool;
+        out->primType = PrimitiveType::Bool;
         break;
 
     case ExprType::LitStr:
-        out->type = PrimitiveType::Str;
+        out->primType = PrimitiveType::Str;
         break;
 
     case ExprType::LitByte:
-        out->type = PrimitiveType::Byte;
+        out->primType = PrimitiveType::Byte;
         break;
 
     case ExprType::Assign:
         // Assignment does not have a value
-        out->type = PrimitiveType::Void;
+        out->primType = PrimitiveType::Void;
         break;
     }
 
@@ -243,7 +249,7 @@ void typeCheckStmt(StmtNodePtr node, TypeNodePtr retType)
         {
             typeCheckExpr(node->initExpr);
             TypeNodePtr t = typeCheckExpr(node->expr);
-            if(t->type != PrimitiveType::Bool)
+            if(t->primType != PrimitiveType::Bool)
             {
                 std::stringstream ss;
                 ss << "Invalid for-loop check expr, expected bool, got "
@@ -257,10 +263,10 @@ void typeCheckStmt(StmtNodePtr node, TypeNodePtr retType)
         case StmtType::IfElse:
         {
             TypeNodePtr t = typeCheckExpr(node->expr);
-            if(t->type == PrimitiveType::Bool)
+            if(t->primType != PrimitiveType::Bool)
             {
                 std::stringstream ss;
-                ss << "Invalid if expr, expected bool, got " << t->toStr();
+                ss << "Invalid if expr, expected Bool, got " << t->toStr();
                 throw BeeError(ss.str());
             }
 
@@ -287,7 +293,7 @@ void typeCheckStmt(StmtNodePtr node, TypeNodePtr retType)
 
 void typeCheckDecl(DeclNodePtr node)
 {
-    switch(node->type->type)
+    switch(node->type->primType)
     {
     case PrimitiveType::Void:
         // TODO
@@ -302,11 +308,14 @@ void typeCheckDecl(DeclNodePtr node)
         {
             std::stringstream ss;
             ss << "Cannot initialize var of type "
-               << getPrimitiveTypeName(node->type->type)
+               << getPrimitiveTypeName(node->type->primType)
                << " with value of type "
-               << getPrimitiveTypeName(valueType->type);
+               << getPrimitiveTypeName(valueType->primType);
             throw BeeError(ss.str());
         }
+
+        // store the type in the symbol
+        node->symbol->type = valueType;
 
         break;
     }
@@ -329,8 +338,8 @@ void typeCheckDecl(DeclNodePtr node)
             {
                 std::stringstream ss;
                 ss << "Invalid value in array literal, expected "
-                   << getPrimitiveTypeName(node->type->type) << " got"
-                   << getPrimitiveTypeName(t->type);
+                   << getPrimitiveTypeName(node->type->primType) << " got"
+                   << getPrimitiveTypeName(t->primType);
                 throw BeeError(ss.str());
             }
 

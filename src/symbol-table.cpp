@@ -2,6 +2,8 @@
 
 #include <beescript/errors.h>
 
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 namespace bees {
@@ -74,6 +76,7 @@ void SymbolTable::resolveDecl(DeclNodePtr node)
 
     resolveExpr(node->value);
     bind(out);
+    node->symbol = out;
 
     if(node->code)
     {
@@ -88,6 +91,11 @@ void SymbolTable::resolveDecl(DeclNodePtr node)
 
 void SymbolTable::resolveStmt(StmtNodePtr node)
 {
+    if(!node)
+    {
+        return;
+    }
+
     switch(node->kind)
     {
     case StmtType::Decl:
@@ -157,7 +165,14 @@ void SymbolTable::resolveExpr(ExprNodePtr node)
 
     if(node->type == ExprType::Name)
     {
-        node->symbol = lookup(node->name);
+        SymbolPtr s = lookup(node->name);
+        if(!s)
+        {
+            std::stringstream ss;
+            ss << "Unbound symbol: " << node->name;
+            throw BeeError(ss.str());
+        }
+        node->symbol = s;
     }
     else
     {

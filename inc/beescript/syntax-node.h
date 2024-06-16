@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include <beescript/symbol.h>
@@ -25,6 +26,8 @@ public:
     SyntaxNode(NodeType nodeType);
     std::shared_ptr<SyntaxNode> next;
     std::shared_ptr<Symbol> symbol;
+
+    virtual std::string toStr() = 0;
 };
 
 using SyntaxNodePtr = std::shared_ptr<SyntaxNode>;
@@ -62,6 +65,8 @@ public:
     ArgList();
     std::string name;
     TypeNodePtr type;
+
+    std::string toStr() override;
 };
 
 class TypeNode : public SyntaxNode
@@ -69,7 +74,7 @@ class TypeNode : public SyntaxNode
 public:
     TypeNode();
 
-    PrimitiveType type;
+    PrimitiveType primType;
     TypeNodePtr subtype;
     ArgListPtr args;
     size_t size;
@@ -77,7 +82,7 @@ public:
     bool equals(const TypeNodePtr other);
     bool equals(const TypeNode& other);
 
-    std::string toStr();
+    std::string toStr() override;
 };
 
 // STMT NODE -------------------------------------------------
@@ -105,6 +110,8 @@ public:
     ExprNodePtr nextExpr; // for loop update
     StmtNodePtr body;
     StmtNodePtr elseBody;
+
+    std::string toStr() override;
 };
 
 // EXPR NODE -------------------------------------------------
@@ -159,6 +166,8 @@ public:
 
     ExprNode();
     ExprNode(ExprType type, SyntaxNodePtr left, SyntaxNodePtr right);
+
+    std::string toStr() override;
 };
 
 // DECL NODE -------------------------------------------------
@@ -171,6 +180,8 @@ public:
     TypeNodePtr type;
     ExprNodePtr value;
     StmtNodePtr code;
+
+    std::string toStr() override;
 };
 
 } //namespace bees

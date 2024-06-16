@@ -49,12 +49,12 @@ bool TypeNode::equals(const TypeNodePtr other)
 
 bool TypeNode::equals(const TypeNode& other)
 {
-    if(type != other.type)
+    if(primType != other.primType)
     {
         return false;
     }
 
-    switch(type)
+    switch(primType)
     {
     case PrimitiveType::Array:
         return subtype->equals(*other.subtype);
@@ -95,10 +95,10 @@ bool TypeNode::equals(const TypeNode& other)
 std::string TypeNode::toStr()
 {
     std::stringstream ss;
-    switch(type)
+    switch(primType)
     {
     case PrimitiveType::Array:
-        ss << "Array[" << subtype->toStr() << "]";
+        ss << subtype->toStr() << "[" << size << "]";
         break;
     case PrimitiveType::Func:
     {
@@ -116,10 +116,15 @@ std::string TypeNode::toStr()
         ss << "] -> " << subtype->toStr();
     }
     default:
-        ss << getPrimitiveTypeName(type);
+        ss << getPrimitiveTypeName(primType);
     }
 
     return ss.str();
+}
+
+std::string ArgList::toStr()
+{
+    return "NotImpl";
 }
 
 } //namespace bees

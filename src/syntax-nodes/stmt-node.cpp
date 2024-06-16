@@ -13,6 +13,13 @@ StmtNode::StmtNode(StmtType kind)
 {
 }
 
+std::string StmtNode::toStr()
+{
+    std::stringstream ss;
+
+    return "NotImpl";
+}
+
 std::string getStmtTypeName(StmtType type)
 {
     switch(type)

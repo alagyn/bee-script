@@ -2,7 +2,7 @@ type
     = type_name OPEN_SQUARE LIT_INT CLOSE_SQUARE
     {
         auto out = std::make_shared<TypeNode>();
-        out->type = PrimitiveType::Array;
+        out->primType = PrimitiveType::Array;
         out->size = std::stoi($LIT_INT);
         out->subtype = std::static_pointer_cast<TypeNode>($type_name);
         return out;
@@ -14,25 +14,25 @@ type_name
     = TYPE_INT
     {
         auto out = std::make_shared<TypeNode>();
-        out->type = PrimitiveType::Int;
+        out->primType = PrimitiveType::Int;
         return out;
     }
     | TYPE_STR
     {
         auto out = std::make_shared<TypeNode>();
-        out->type = PrimitiveType::Str;
+        out->primType = PrimitiveType::Str;
         return out;
     }
     | TYPE_BOOL
     {
         auto out = std::make_shared<TypeNode>();
-        out->type = PrimitiveType::Bool;
+        out->primType = PrimitiveType::Bool;
         return out;
     }
     | TYPE_VOID
     {
         auto out = std::make_shared<TypeNode>();
-        out->type = PrimitiveType::Void;
+        out->primType = PrimitiveType::Void;
         return out;
     }
     ;
