@@ -47,6 +47,9 @@ std::string ExprNode::toStr()
     case ExprType::LitByte:
         ss << intValue;
         return ss.str();
+    case ExprType::LitFloat:
+        ss << floatValue;
+        return ss.str();
     case ExprType::LitArray:
     {
         ss << "[";
@@ -191,14 +194,16 @@ std::string getExprTypeName(ExprType type)
         return "Call";
     case ExprType::Subscript:
         return "Subscript";
-    case ExprType::LitInt:
-        return "LitInt";
     case ExprType::LitBool:
         return "LitBool";
-    case ExprType::LitStr:
-        return "LitStr";
     case ExprType::LitByte:
         return "LitByte";
+    case ExprType::LitInt:
+        return "LitInt";
+    case ExprType::LitFloat:
+        return "LitFloat";
+    case ExprType::LitStr:
+        return "LitStr";
     case ExprType::LitArray:
         return "LitArray";
     default:

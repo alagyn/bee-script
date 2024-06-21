@@ -4,6 +4,7 @@
 #include <hermes/beescript_loader.h>
 #include <hermes/errors.h>
 
+#include <beescript/ast-to-dag.h>
 #include <beescript/symbol-table.h>
 #include <beescript/type-check.h>
 
@@ -23,8 +24,14 @@ int main(int argc, char** argv)
 
     try
     {
+        bool error = false;
         auto parser = hermes::load_beescript();
-        root = parser->parse(input);
+        root = parser->parse(input, error);
+        if(error)
+        {
+            std::cout << "Error parsing" << std::endl;
+            return 1;
+        }
     }
     catch(const std::exception& err)
     {
@@ -57,6 +64,8 @@ int main(int argc, char** argv)
         std::cout << "Error type-checking: " << err.what() << std::endl;
         return 1;
     }
+
+    DAGNodePtr dag = astToDag(root);
 
     return 0;
 }

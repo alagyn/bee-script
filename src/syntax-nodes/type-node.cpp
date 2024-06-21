@@ -19,6 +19,8 @@ std::string getPrimitiveTypeName(PrimitiveType type)
         return "byte";
     case PrimitiveType::Int:
         return "int";
+    case PrimitiveType::Float:
+        return "float";
     case PrimitiveType::Str:
         return "str";
     case PrimitiveType::Bool:

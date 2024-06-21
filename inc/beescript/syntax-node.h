@@ -51,6 +51,7 @@ enum class PrimitiveType
     Void,
     Byte,
     Int,
+    Float,
     Str,
     Bool,
     Func,
@@ -146,10 +147,11 @@ enum class ExprType
     Call,
     Subscript,
 
-    LitInt,
     LitBool,
-    LitStr,
     LitByte,
+    LitInt,
+    LitFloat,
+    LitStr,
     LitArray
 };
 
@@ -163,6 +165,7 @@ public:
 
     std::string name;
     int intValue;
+    float floatValue;
     std::string strValue;
 
     ExprNode();

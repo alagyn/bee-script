@@ -19,10 +19,28 @@ type
     ;
 
 type_name
-    = TYPE_INT
+    = TYPE_BOOL
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->primType = PrimitiveType::Bool;
+        return out;
+    }
+    | TYPE_BYTE
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->primType = PrimitiveType::Byte;
+        return out;
+    }
+    | TYPE_INT
     {
         auto out = std::make_shared<TypeNode>();
         out->primType = PrimitiveType::Int;
+        return out;
+    }
+    | TYPE_FLOAT
+    {
+        auto out = std::make_shared<TypeNode>();
+        out->primType = PrimitiveType::Float;
         return out;
     }
     | TYPE_STR
@@ -31,22 +49,10 @@ type_name
         out->primType = PrimitiveType::Str;
         return out;
     }
-    | TYPE_BOOL
-    {
-        auto out = std::make_shared<TypeNode>();
-        out->primType = PrimitiveType::Bool;
-        return out;
-    }
     | TYPE_VOID
     {
         auto out = std::make_shared<TypeNode>();
         out->primType = PrimitiveType::Void;
-        return out;
-    }
-    | TYPE_BYTE
-    {
-        auto out = std::make_shared<TypeNode>();
-        out->primType = PrimitiveType::Byte;
         return out;
     }
     ;

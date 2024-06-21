@@ -35,14 +35,16 @@ OP_SLASH = "/";
 OP_MOD = "%";
 OP_POW = "\*\*";
 
+TYPE_BYTE = "byte";
 TYPE_INT = "int";
+TYPE_FLOAT = "float";
 TYPE_BOOL = "bool";
 TYPE_STR = "str";
-TYPE_BYTE = "byte";
 TYPE_VOID = "void";
 
 LIT_INT = "-?\d+";
 LIT_STR = '"([^"]|(\\"))*"';
+LIT_FLOAT = "-?\d+\.\d+";
 LIT_CHAR = "'([^']|(\\.))'";
 LIT_BOOL_FALSE = "false";
 LIT_BOOL_TRUE = "true";

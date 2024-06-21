@@ -53,6 +53,12 @@ def main() -> int
 
     twoD: int[5][5];
 
+    twoD[0][2] = 6;
+    twoD[1][2] = 'a';
+
+    twoD[1] = [0, 5, 3];
+    twoD[0] = 'a';
+
     uninit: byte;
 
     badArray: int[5] = 6;
@@ -65,6 +71,11 @@ def main() -> int
     misize1: int[4] = [0, 0, 0];
     rightSize: int[4] = [0, 0, 0, 0];
     misize1: int[4] = [0, 0, 0, 0, 0];
+
+    anySize: int[] = [0, 2];
+
+    noInitArray: int[5]; 
+    noInitAnySizeArray: int[];
 
     if(x == 0)
     {
@@ -80,6 +91,13 @@ def main() -> int
     myByte: byte = 0xFF;
     myByte = 'a';
     myByte = myStr[0];
+
+    myFloat: float = 0.1;
+    myFloat = 1;
+    myFloat = 2.5;
+    myFloat = 1 + 5;
+    myFloat = 'a';
+    myFloat = "asdf";
 
     return 1;
 }

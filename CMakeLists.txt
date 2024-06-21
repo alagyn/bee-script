@@ -11,12 +11,13 @@ add_hermes_grammar(
     GRAMMAR grammar/bee-script.hm
     GRAMMAR_DIR grammar
     TARGET beescript
-    # DEBUG
+    DEBUG
     # DESC_FILE temp.txt
     STRICT
 )
 
 add_executable(bees
+    src/dag-node.cpp
     src/errors.cpp
     src/main.cpp
     src/symbol.cpp

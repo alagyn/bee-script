@@ -89,22 +89,6 @@ argument = expr
 
 bottom_val
     = loc
-    | LIT_INT
-    {
-        auto out = std::make_shared<ExprNode>();
-        out->type = ExprType::LitInt;
-        out->intValue = std::stoi($0);
-        return out;
-    }
-    | LIT_STR
-    {
-        auto out = std::make_shared<ExprNode>();
-        out->type = ExprType::LitStr;
-        std::string temp = $0;
-        out->strValue = temp.substr(1, temp.size() - 2);
-        return out;
-    }
-    | OPEN_PAREN expr CLOSE_PAREN { return $expr; }
     | lit_bool
     | LIT_BYTE
     {
@@ -141,6 +125,29 @@ bottom_val
 
         return out;
     }
+    | LIT_INT
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitInt;
+        out->intValue = std::stoi($0);
+        return out;
+    }
+    | LIT_FLOAT
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitFloat;
+        out->floatValue = std::stof($0);
+        return out;
+    }
+    | LIT_STR
+    {
+        auto out = std::make_shared<ExprNode>();
+        out->type = ExprType::LitStr;
+        std::string temp = $0;
+        out->strValue = temp.substr(1, temp.size() - 2);
+        return out;
+    }
+    | OPEN_PAREN expr CLOSE_PAREN { return $expr; }
     | lit_array
     ;
 

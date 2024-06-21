@@ -275,6 +275,11 @@ public:
         case ExprType::LitByte:
             out->primType = PrimitiveType::Byte;
             break;
+
+        case ExprType::LitFloat:
+            out->primType = PrimitiveType::Float;
+            break;
+
         case ExprType::LitArray:
         {
             out->primType = PrimitiveType::Array;
@@ -319,8 +324,9 @@ public:
             if(!lType->equals(rType))
             {
                 std::cerr << "Cannot assign var (" << node->left->toStr()
-                          << ": " << lType->toStr() << ") value of type "
-                          << rType->toStr() << std::endl;
+                          << ": " << lType->toStr() << ") value ("
+                          << node->right->toStr() << "): (" << rType->toStr()
+                          << ")" << std::endl;
                 error = true;
                 out->primType = PrimitiveType::Invalid;
                 break;
