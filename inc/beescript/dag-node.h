@@ -8,15 +8,23 @@ namespace bees {
 enum class DAGType
 {
     Assign,
-    Name,
+    Deref,
 
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Mod,
-    Pow,
-    Neg,
+    IAdd,
+    ISub,
+    IMul,
+    IDiv,
+    IMod,
+    IPow,
+    INeg,
+
+    FAdd,
+    FSub,
+    FMul,
+    FDiv,
+    FMod,
+    FPow,
+    FNeg,
 
     LogAnd,
     LogOr,
@@ -36,8 +44,7 @@ enum class DAGType
     LitByte,
     LitInt,
     LitFloat,
-    LitStr,
-    LitArray
+    LitStr
 };
 
 class DAGNode

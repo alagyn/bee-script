@@ -23,6 +23,10 @@ class SyntaxNode
 {
 public:
     const NodeType nodeType;
+
+    // register containing this "value" during code generation
+    int reg;
+
     SyntaxNode(NodeType nodeType);
     std::shared_ptr<SyntaxNode> next;
     std::shared_ptr<Symbol> symbol;

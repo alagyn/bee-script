@@ -17,12 +17,14 @@ add_hermes_grammar(
 )
 
 add_executable(bees
-    src/dag-node.cpp
+    # src/dag-node.cpp
+    src/code-gen.cpp
     src/errors.cpp
     src/main.cpp
     src/symbol.cpp
     src/symbol-table.cpp
     src/type-check.cpp
+    src/x86-code-gen.cpp
     
     src/syntax-nodes/decl-node.cpp
     src/syntax-nodes/expr-node.cpp
